@@ -50,16 +50,21 @@ function automod_loop() {
 		let autoPrice = getToggle('AutoPrice');
 		let autoWire = getToggle('AutoWire');
 
-		let avgSalesLower;
-		if (margin > 0.015) {
-			let d = demand * margin / (margin - 0.01);
-			avgSalesLower = d / 100 * (.7 * Math.pow(d, 1.15)) * 10;
-		}
+        let clipRate = clipperBoost * clipmakerLevel + megaClipperBoost * (megaClipperLevel * 500);
 
-		let clipRate = clipperBoost * clipmakerLevel + megaClipperBoost * (megaClipperLevel * 500);
-		let avgSales = demand / 100 * (.7 * Math.pow(demand, 1.15)) * 10
+		if (autoPrice && clipRate > 1) {
+            let avgSalesLower;
+            if (margin > 0.015) {
+                let d = demand * margin / (margin - 0.01);
+                let chance = d / 100;
+                if (chance > 1) chance = 1;
+                avgSalesLower = chance * (.7 * Math.pow(d, 1.15)) * 10;
+            }
 
-		if (autoPrice && humanFlag == 1 && clipRate > 1) {
+            let chance = demand / 100;
+            if (chance > 1) chance = 1;
+            let avgSales = chance * (.7 * Math.pow(demand, 1.15)) * 10
+
 			if (avgSales > clipRate) {
 				raisePrice();
 			} else if (margin > 0.015 && avgSalesLower < clipRate) {
@@ -67,7 +72,7 @@ function automod_loop() {
 			}
 		}
 
-		if (autoWire && humanFlag == 1 && wire < 500) {
+		if (autoWire && wire < 500) {
 			buyWire()
 		}
 	}
@@ -75,12 +80,13 @@ function automod_loop() {
 	let autoQuantum = getToggle('AutoQuantum');
 	let autoTourney = getToggle('AutoTourney');
 	let autoTrust = getToggle('AutoTrust');
+
 	if (autoQuantum) {
 		let q = 0;
 		for (var i = 0; i < qChips.length; i++){
 			q = q + qChips[i].value;
 		}
-		if (q > 0.1 && memory * 1000 > standardOps && Math.random() > 0.5) {
+		if (q > 0.1 && memory * 1000 > standardOps) {
 			qComp();
 		}
 	}
@@ -133,16 +139,16 @@ function automod_loop() {
 		25, // megaclipper 3
 		49, // Greedy
 		30, 34, 31,  // +trust
-		10, // wire 5
 		33, // global warming
-		50, 51, 52, 53, // all strats
-		36, 37, // takeover, monopoly
+		// 36, 37, // takeover, monopoly
 		32, // world peace
+		50, 51, 52, 53, // all strats
+		10, // wire 5
 		42, // goodwill 1
 		28, 29, // hypnodrones
-		18, 35, 66, 39, 40, 41, // begin of stage 2
-		61, // theory of mind
+		18, 66, 35, 39, 40, 41, // begin of stage 2
 		64, 65, // momentum, swarm
+		61, // theory of mind
 		44, // go to stage 3
 		75, 76, 77, 78, 79, 80, 81, 82 // accept
 
