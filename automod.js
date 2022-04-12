@@ -140,10 +140,9 @@ function automod_loop() {
 	if (autoTourney) {
         let stratPicker = document.getElementById('stratPicker');
 
-        if (project62.flag == 1 && stratPicker.value == 10) {
+        if (project62.flag == 1 && payoffGrid.valueAA == 0 && payoffGrid.valueAB == 0 && payoffGrid.valueBA == 0 && payoffGrid.valueBB == 0) {
 			newTourney();
 			runTourney();
-            stratPicker.value = 0;
         } else if ((resultsFlag == 1) && operations >= tourneyCost) {
 			newTourney();
 			runTourney();
