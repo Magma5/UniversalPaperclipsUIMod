@@ -138,11 +138,17 @@ function automod_loop() {
 	}
 
 	if (autoTourney) {
-		if ((resultsFlag == 1) && operations >= tourneyCost) {
+        let stratPicker = document.getElementById('stratPicker');
+
+        if (project62.flag == 1 && stratPicker.value == 10) {
+			newTourney();
+			runTourney();
+            stratPicker.value = 0;
+        } else if ((resultsFlag == 1) && operations >= tourneyCost) {
 			newTourney();
 			runTourney();
 		}
-		document.getElementById('stratPicker').value = predictWinner();
+		stratPicker.value = predictWinner();
 	}
 
 	if (autoTrust) {
@@ -185,10 +191,11 @@ function automod_loop() {
 		25, // megaclipper 3
 		49, // Greedy
 		30, 34, 31,  // +trust
+        50, // generous
 		33, // global warming
 		// 36, 37, // takeover, monopoly
 		32, // world peace
-		50, 51, 52, 53, // all strats
+		51, 52, 53, // all strats
 		10, // wire 5
 		42, // goodwill 1
 		28, 29, // hypnodrones
@@ -201,18 +208,23 @@ function automod_loop() {
 
 	let autoProjects = getToggle('AutoProjects');
 	if (autoProjects) {
+        let success = 0;
 		for (let i in projectOrder) {
 			let p = projectOrder[i];
 			if (projects[p].flag == 0) {
+                // Don't do -trust if can't afford megaclippers
+                if (p == 27 && memory < 12) {
+                    break;
+                }
 				if (activeProjects.indexOf(projects[p]) != -1 && projects[p].cost()) {
 					projects[p].effect();
+                    success = true;
 				}
-				console.log(p);
 				break;
 			}
 		}
 
-        if (nextQchip < 3 && project51.trigger() && project51.cost()) {
+        if (!success && project51.flag == 1 && nextQchip < 3 && project51.cost()) {
             project51.effect();
         }
 	}
