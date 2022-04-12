@@ -49,10 +49,11 @@ function automod_loop() {
 	if (humanFlag == 1) {
 		let autoPrice = getToggle('AutoPrice');
 		let autoWire = getToggle('AutoWire');
+		let autoInvest = getToggle('AutoInvest');
 
         let clipRate = clipperBoost * clipmakerLevel + megaClipperBoost * (megaClipperLevel * 500);
 
-		if (autoPrice && clipRate > 1) {
+		if (autoPrice && clipRate > 0) {
             let avgSalesLower;
             if (margin > 0.015) {
                 let d = demand * margin / (margin - 0.01);
@@ -66,7 +67,9 @@ function automod_loop() {
             let avgSales = chance * (.7 * Math.pow(demand, 1.15)) * 10
 
 			if (avgSales > clipRate) {
-				raisePrice();
+                if (margin < 10) {
+                    raisePrice();
+                }
 			} else if (margin > 0.015 && avgSalesLower < clipRate) {
 				lowerPrice();
 			}
@@ -75,6 +78,49 @@ function automod_loop() {
 		if (autoWire && wire < 500) {
 			buyWire()
 		}
+
+        if (autoInvest) {
+            if (autoClipperFlag == 0) {
+                clipClick(1);
+            } else if (avgRev * 2 > adCost) {
+                buyAds();
+            } else if (clipmakerLevel < 75) {
+                makeClipper();
+            } else if (megaClipperLevel < 35) {
+                if (megaClipperFlag == 1) {
+                    makeMegaClipper();
+                }
+            } else if (project37.flag == 0) {
+                if (activeProjects.indexOf(project37) == -1) {
+                    investDeposit();
+                } else if (project37.cost()) {
+                    project37.effect();
+                } else if (bankroll > 0) {
+                    investWithdraw();
+                }
+            } else if (megaClipperLevel < 70) {
+                makeMegaClipper();
+            } else if (project38.flag == 0) { // takeover
+                if (project38.cost() && activeProjects.indexOf(project38) != -1) {
+                    project38.effect();
+                }
+            } else if (megaClipperLevel < 100) {
+                makeMegaClipper();
+            } else if (investLevel < 5) {
+                if (yomi > investUpgradeCost) {
+                    investUpgrade();
+                }
+            } else if (clips < 122000000) {
+                document.getElementById('investStrat').value = "hi"
+                if (funds > 1000000) {
+                    investDeposit();
+                }
+            } else if (bankroll > 0) {
+                investWithdraw();
+            } else if (project40b.trigger() && project40b.cost()) {
+                project40b.effect();
+            }
+        }
 	}
 
 	let autoQuantum = getToggle('AutoQuantum');
@@ -92,7 +138,7 @@ function automod_loop() {
 	}
 
 	if (autoTourney) {
-		if (resultsFlag == 1 && operations >= tourneyCost) {
+		if ((resultsFlag == 1) && operations >= tourneyCost) {
 			newTourney();
 			runTourney();
 		}
@@ -151,7 +197,6 @@ function automod_loop() {
 		61, // theory of mind
 		44, // go to stage 3
 		75, 76, 77, 78, 79, 80, 81, 82 // accept
-
 	]
 
 	let autoProjects = getToggle('AutoProjects');
@@ -166,6 +211,10 @@ function automod_loop() {
 				break;
 			}
 		}
+
+        if (nextQchip < 3 && project51.trigger() && project51.cost()) {
+            project51.effect();
+        }
 	}
 
 }
@@ -184,6 +233,7 @@ function automod_ready() {
 	document.getElementById('topDiv').appendChild(divAutoMod);
 
 	addToggle('AutoPrice');
+	addToggle('AutoInvest');
 	addToggle('AutoWire');
 	addToggle('AutoQuantum');
 	addToggle('AutoTourney');
